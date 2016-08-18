@@ -8,13 +8,11 @@ if($_SERVER["REQUEST_METHOD"]==="POST"){
         $orderToAdd->setQuantity($_POST['quantity']);
         $orderToAdd->setPrice($_POST['price']);
         if($result=$orderToAdd->saveToDB($conn)){
-//            $jsonRespond=  json_encode(['status'=>'success']);
-//            echo($jsonRespond);
-            echo ("OK");
+            $jsonRespond=  json_encode(['status'=>'success']);
+            echo($jsonRespond);
         }
         else{
-//            $jsonRespond=  json_encode(['status'=>'fail']);
-//            echo($jsonRespond);
-            echo ("Not ok :(");
+            $jsonRespond=  json_encode(['status'=>'fail']);
+            echo($jsonRespond);
         } 
 }
