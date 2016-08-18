@@ -30,7 +30,8 @@ if($_SERVER["REQUEST_METHOD"]==="GET"){
     }else{
         if(isset($_GET['quantity'])){
             if($price=Order::calculatePrice($conn, $_GET['quantity'])){
-                echo($price);
+                $jsonRespond= json_encode(['status'=>'success', 'price'=>$price]);
+                echo($jsonRespond);
             } 
         }
         else{
