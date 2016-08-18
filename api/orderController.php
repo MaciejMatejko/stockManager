@@ -29,11 +29,9 @@ if($_SERVER["REQUEST_METHOD"]==="GET"){
         echo($jsonRespond);
     }else{
         if(isset($_GET['quantity'])){
-            $orderToShow = new Order();
-            if($orderToShow->loadFromDB($conn, $_GET['quantity'])){
-                $price = round(($orderToShow->getPrice()*110/100), 2);
+            if($price=Order::loadFromDB($conn, $_GET['quantity'])){
                 echo($price);
-            }  
+            } 
         }
         else{
             $jsonRespond=  json_encode(['status'=>'fail']);
@@ -54,4 +52,5 @@ if($_SERVER["REQUEST_METHOD"]==="PUT"){
         echo($jsonRespond);
     }
 }
+
 

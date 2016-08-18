@@ -1,4 +1,5 @@
 <?php
+require_once(__DIR__.'/conn.php');
 
 class Order {
     
@@ -13,6 +14,52 @@ class Order {
             return true;
         }
         return false;
+    }
+    
+    public static function loadFromDB(mysqli $conn, $quantity)
+    {
+        $sql = "SELECT  NULL AS id, NULL AS quantity, NULL AS price, NULL AS total
+                FROM dual
+                WHERE (@total := 0)
+                UNION
+                SELECT id, quantity, price, @total := @total + quantity AS total
+                FROM Orders
+                WHERE @total < $quantity
+                GROUP BY id DESC;";
+        $result = $conn->query($sql);
+        if($result != false){
+            if($result->num_rows>0){
+                while($row=$result->fetch_assoc()){
+                    $ret[]=$row;
+                }
+            }
+        }else{
+            return false;
+        }
+        
+        return self::calculatePrice($ret, $quantity);
+    }
+    
+    public static function calculatePrice($array, $quantity)
+    {
+        $sum=0;
+        $price=0;
+        if(count($array)===1){
+            return round(($array[0]["price"]*1.1), 2);
+        }
+        else{
+            foreach($array as $row){
+                if($quantity >= ($sum + $row["quantity"])){
+                    $price = $price + ($row["quantity"]*$row["price"]);
+                    $sum+=$row["quantity"];
+                }else{
+                    $price = $price + (($quantity-$sum)*$row["price"]);
+                    $sum=$quantity; 
+                }
+                
+            }
+            return round(($price/$sum)*1.1, 2);
+        }
     }
     
     public function __construct() {
@@ -65,20 +112,6 @@ class Order {
                 return false;
             }
         }
-    }
-    
-    public function loadFromDB(mysqli $conn, $quantity)
-    {
-        $sql = "SELECT * FROM Orders WHERE quantity = {$quantity} ORDER BY id DESC LIMIT 1";
-        $result = $conn->query($sql);
-        if($result->num_rows===1){
-            $row = $result->fetch_assoc();
-            $this->id=(int)$row['id'];
-            $this->setQuantity($row['quantity']);
-            $this->setPrice($row['price']);
-            return true;
-        }
-        return false;
     }
 
 }

@@ -40,6 +40,7 @@ $(function(){
             button.addClass("sellBtn");
             priceInput.val(price);
             quantityInput.parent().append(priceInput);
+            quantityInput.attr("readonly", true);
         }).fail(function(xhr, status, error){
             console.log("Ajax faild when showing price");
         });
