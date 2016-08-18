@@ -2,7 +2,7 @@
 
 <html>
     <head>
-        <title>Stocm Manager</title>
+        <title>Stock Manager</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="js/jquery-2.2.4.js"></script>
@@ -23,12 +23,12 @@
         </div>
         <br />
         <div>
-            <form action="#" method="GET" id="newOrder">
+            <form action="#" method="POST" id="newOrder">
                 <fieldset>
                     <legend>New Order</legend>
                     <p><label>Quantity</label>
-                        <input type="number" name="quantity" step="1" min="0"></p>
-                    <input type="submit" value="Show price" id="submit">
+                        <input id ="orderQuantity" type="number" name="quantity" step="1" min="0"></p>
+                    <button class="showBtn">Show price</button>
                 </fieldset>
             </form>
         </div>

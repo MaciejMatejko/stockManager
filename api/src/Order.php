@@ -6,6 +6,15 @@ class Order {
     private $quantity;
     private $price;
     
+        public static function sell(mysqli $conn, $quantity)
+    {
+        $sql = "DELETE FROM Orders WHERE quantity=$quantity LIMIT 1";
+        if($conn->query($sql)){
+            return true;
+        }
+        return false;
+    }
+    
     public function __construct() {
         $this->id = -1;
         $this->quantity = null;
@@ -57,7 +66,20 @@ class Order {
             }
         }
     }
-
+    
+    public function loadFromDB(mysqli $conn, $quantity)
+    {
+        $sql = "SELECT * FROM Orders WHERE quantity = {$quantity} ORDER BY id DESC LIMIT 1";
+        $result = $conn->query($sql);
+        if($result->num_rows===1){
+            $row = $result->fetch_assoc();
+            $this->id=(int)$row['id'];
+            $this->setQuantity($row['quantity']);
+            $this->setPrice($row['price']);
+            return true;
+        }
+        return false;
+    }
 
 }
 
