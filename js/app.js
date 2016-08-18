@@ -35,11 +35,13 @@ $(function(){
             dataType: "JSON"
         }).done(function(price){
             var priceInput = $("<input type='number' readonly>");
+            var newLabel = $("<p><label>Price </label></p>")
             button.text("Sell");
             button.removeClass("showBtn");
             button.addClass("sellBtn");
             priceInput.val(price);
-            quantityInput.parent().append(priceInput);
+            quantityInput.parent().append(newLabel);
+            newLabel.append(priceInput);
             quantityInput.attr("readonly", true);
         }).fail(function(xhr, status, error){
             console.log("Ajax faild when showing price");

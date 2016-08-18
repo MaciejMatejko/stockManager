@@ -24,12 +24,12 @@ if($_SERVER["REQUEST_METHOD"]==="POST"){
 }
 
 if($_SERVER["REQUEST_METHOD"]==="GET"){
-    if(intval($_GET['quantity'])<=0){
-        $jsonRespond=  json_encode(['status'=>'fail', 'reason'=>'quantity is 0 or lesser']);
+    if(intval($_GET['quantity'])<=0 || !isset($_GET['quantity'])){
+        $jsonRespond=  json_encode(['status'=>'fail', 'reason'=>'quantity is 0 or lesser or is not set']);
         echo($jsonRespond);
     }else{
         if(isset($_GET['quantity'])){
-            if($price=Order::loadFromDB($conn, $_GET['quantity'])){
+            if($price=Order::calculatePrice($conn, $_GET['quantity'])){
                 echo($price);
             } 
         }

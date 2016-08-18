@@ -1,5 +1,4 @@
 <?php
-require_once(__DIR__.'/conn.php');
 
 class Order {
     
@@ -7,14 +6,6 @@ class Order {
     private $quantity;
     private $price;
     
-        public static function sell(mysqli $conn, $quantity)
-    {
-        $sql = "DELETE FROM Orders WHERE quantity=$quantity LIMIT 1";
-        if($conn->query($sql)){
-            return true;
-        }
-        return false;
-    }
     
     public static function loadFromDB(mysqli $conn, $quantity)
     {
@@ -37,14 +28,15 @@ class Order {
             return false;
         }
         
-        return self::calculatePrice($ret, $quantity);
+        return $ret;
     }
     
-    public static function calculatePrice($array, $quantity)
+    public static function calculatePrice(mysqli $conn, $quantity)
     {
+        $array=self::loadFromDB($conn, $quantity);
         $sum=0;
         $price=0;
-        if(count($array)===1){
+        if(count($array)===1 && $quantity==$array[0]["quantity"]){
             return round(($array[0]["price"]*1.1), 2);
         }
         else{
@@ -58,8 +50,37 @@ class Order {
                 }
                 
             }
-            return round(($price/$sum)*1.1, 2);
+            if($sum<$quantity){
+                return false;
+            }else{
+                return round(($price/$sum)*1.1, 2);
+            }
+            
         }
+    }
+    
+    public static function sell(mysqli $conn, $quantity)
+    {
+        $array=self::loadFromDB($conn, $quantity);
+        $sum=0;
+        $toDelArr=[];
+        foreach($array as $row){
+            if($quantity >= ($sum + $row["quantity"])){
+                $toDelArr[]=$row["id"];
+                $sum+=$row["quantity"];
+            }
+            else{
+                $newQuantity = $sum+$row["quantity"]-$quantity;
+                $updateSql="UPDATE Orders SET quantity = {$newQuantity} WHERE id = {$row['id']}";
+                $conn->query($updateSql);
+            }
+        }
+        $firstToDel = end($toDelArr);
+        $deleteSql = "DELETE FROM Orders WHERE id BETWEEN $firstToDel AND $toDelArr[0]";
+        if($conn->query($deleteSql)){
+            return true;
+        }
+        return false;
     }
     
     public function __construct() {
@@ -102,15 +123,6 @@ class Order {
                 return true;
             }
             return false;
-        }
-        else{
-            $sql = "UPDATE Orders SET quantity = '{$this->getQuantity()}', price = '{$this->getPrice()}' WHERE id = {$this->getId()}";
-            if($conn->query($sql) === true){
-                return true;
-            }
-            else{
-                return false;
-            }
         }
     }
 
